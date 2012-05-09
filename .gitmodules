@@ -1,0 +1,3 @@
+[submodule "glmatrix"]
+	path = glmatrix
+	url = git://github.com/martinsik/glmatrix.dart.git
