@@ -1,11 +1,11 @@
 #import('dart:html');
-#import('../glmatrix/glmatrix.dart');
+#import('../gl-matrix-dart/gl-matrix.dart');
 
 /**
  * based on:
  * http://learningwebgl.com/blog/?p=134
  */
-class Lesson01 {
+class Lesson02 {
   
   CanvasElement _canvas;
   WebGLRenderingContext _gl;
@@ -20,8 +20,8 @@ class Lesson01 {
   WebGLBuffer _squareVertexPositionBuffer;
   WebGLBuffer _squareVertexColorBuffer;
   
-  Matrix _pMatrix;
-  Matrix _mvMatrix;
+  Matrix4 _pMatrix;
+  Matrix4 _mvMatrix;
   
   int _aVertexPosition;
   int _aVertexColor;
@@ -29,12 +29,13 @@ class Lesson01 {
   WebGLUniformLocation _uMVMatrix;
   
   
-  Lesson01(CanvasElement canvas) {
+  Lesson02(CanvasElement canvas) {
     _viewportWidth = canvas.width;
     _viewportHeight = canvas.height;
     _gl = canvas.getContext("experimental-webgl");
-    _mvMatrix = new Matrix();
-    _pMatrix = new Matrix();
+    
+    _mvMatrix = new Matrix4();
+    _pMatrix = new Matrix4();
     
     _initShaders();
     _initBuffers();
@@ -171,8 +172,8 @@ class Lesson01 {
   }
   
   void _setMatrixUniforms() {
-    _gl.uniformMatrix4fv(_uPMatrix, false, _pMatrix.dest);
-    _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.dest);
+    _gl.uniformMatrix4fv(_uPMatrix, false, _pMatrix.array);
+    _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.array);
   }
   
   void render() {
@@ -180,11 +181,11 @@ class Lesson01 {
     _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
     
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
-    Matrix.Perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
+    Matrix4.perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
     
     // draw triangle
-    Matrix.Identity(_mvMatrix);
-    Matrix.Translate(_mvMatrix, new Vector3.fromList([-1.5, 0.0, -7.0]));
+    _mvMatrix.identity();
+    _mvMatrix.translate(new Vector3.fromList([-1.5, 0.0, -7.0]));
     
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
@@ -199,7 +200,8 @@ class Lesson01 {
     
     //print(_gl.getError());
     // draw square
-    Matrix.Translate(_mvMatrix, new Vector3.fromList([3.0, 0.0, 0.0]));
+    _mvMatrix.translate(new Vector3.fromList([3.0, 0.0, 0.0]));
+    
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
     _gl.vertexAttribPointer(_aVertexPosition, _dimensions, WebGLRenderingContext.FLOAT, false, 0, 0);
@@ -215,7 +217,7 @@ class Lesson01 {
 }
 
 void main() {
-  Lesson01 lesson = new Lesson01(document.query('#drawHere'));
+  Lesson02 lesson = new Lesson02(document.query('#drawHere'));
   lesson.render();
   //window.setInterval(f() => lesson.render(), 30);
 }
