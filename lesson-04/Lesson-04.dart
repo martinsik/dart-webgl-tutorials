@@ -2,24 +2,25 @@
 
 #import('../gl-matrix-dart/gl-matrix.dart');
 
+
 /**
  * based on:
- * http://learningwebgl.com/blog/?p=239
+ * http://learningwebgl.com/blog/?p=370
  */
-class Lesson03 {
+class Lesson04 {
   
   CanvasElement _canvas;
   WebGLRenderingContext _gl;
   WebGLProgram _shaderProgram;
-  int _dimensions = 3;
   int _viewportWidth;
   int _viewportHeight;
   
-  WebGLBuffer _triangleVertexPositionBuffer;
-  WebGLBuffer _triangleVertexColorBuffer;
+  WebGLBuffer _pyramidVertexPositionBuffer;
+  WebGLBuffer _pyramidVertexColorBuffer;
   
-  WebGLBuffer _squareVertexPositionBuffer;
-  WebGLBuffer _squareVertexColorBuffer;
+  WebGLBuffer _cubeVertexPositionBuffer;
+  WebGLBuffer _cubeVertexColorBuffer;
+  WebGLBuffer _cubeVertexIndexBuffer;
   
   Matrix4 _pMatrix;
   Matrix4 _mvMatrix;
@@ -30,14 +31,14 @@ class Lesson03 {
   WebGLUniformLocation _uPMatrix;
   WebGLUniformLocation _uMVMatrix;
   
-  double _rTri = 0.0;
-  double _rSquare = 0.0;
+  double _rPyramid = 0.0;
+  double _rCube = 0.0;
   int _lastTime = 0;
   
   var _requestAnimationFrame;
   
   
-  Lesson03(CanvasElement canvas) {
+  Lesson04(CanvasElement canvas) {
     _viewportWidth = canvas.width;
     _viewportHeight = canvas.height;
     _gl = canvas.getContext("experimental-webgl");
@@ -153,51 +154,127 @@ class Lesson03 {
     List<double> vertices, colors;
     
     // create triangle
-    _triangleVertexPositionBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
+    _pyramidVertexPositionBuffer = _gl.createBuffer();
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _pyramidVertexPositionBuffer);
     
     // fill "current buffer" with triangle verticies
     vertices = [
-       0.0,  1.0,  0.0,
-      -1.0, -1.0,  0.0,
-       1.0, -1.0,  0.0
+        // Front face
+        0.0,  1.0,  0.0,
+       -1.0, -1.0,  1.0,
+        1.0, -1.0,  1.0,
+        // Right face
+        0.0,  1.0,  0.0,
+        1.0, -1.0,  1.0,
+        1.0, -1.0, -1.0,
+        // Back face
+        0.0,  1.0,  0.0,
+        1.0, -1.0, -1.0,
+       -1.0, -1.0, -1.0,
+        // Left face
+        0.0,  1.0,  0.0,
+       -1.0, -1.0, -1.0,
+       -1.0, -1.0,  1.0
     ];
     _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), WebGLRenderingContext.STATIC_DRAW);
      
-    _triangleVertexColorBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexColorBuffer);
+    _pyramidVertexColorBuffer = _gl.createBuffer();
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _pyramidVertexColorBuffer);
     colors = [
+        // Front face
         1.0, 0.0, 0.0, 1.0,
         0.0, 1.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0
+        0.0, 0.0, 1.0, 1.0,
+        // Right face
+        1.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        // Back face
+        1.0, 0.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        // Left face
+        1.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 1.0, 0.0, 1.0
     ];
     _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), WebGLRenderingContext.STATIC_DRAW);
     
-    //_triangleVertexPositionBuffer.itemSize = 3;
-    //_triangleVertexPositionBuffer.numItems = 3;
     
     // create square
-    _squareVertexPositionBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
+    _cubeVertexPositionBuffer = _gl.createBuffer();
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
         
     // fill "current buffer" with triangle verticies
     vertices = [
-         1.0,  1.0,  0.0,
-        -1.0,  1.0,  0.0,
-         1.0, -1.0,  0.0,
-        -1.0, -1.0,  0.0
+        // Front face
+        -1.0, -1.0,  1.0,
+         1.0, -1.0,  1.0,
+         1.0,  1.0,  1.0,
+        -1.0,  1.0,  1.0,
+        
+        // Back face
+        -1.0, -1.0, -1.0,
+        -1.0,  1.0, -1.0,
+         1.0,  1.0, -1.0,
+         1.0, -1.0, -1.0,
+        
+        // Top face
+        -1.0,  1.0, -1.0,
+        -1.0,  1.0,  1.0,
+         1.0,  1.0,  1.0,
+         1.0,  1.0, -1.0,
+        
+        // Bottom face
+        -1.0, -1.0, -1.0,
+         1.0, -1.0, -1.0,
+         1.0, -1.0,  1.0,
+        -1.0, -1.0,  1.0,
+        
+        // Right face
+         1.0, -1.0, -1.0,
+         1.0,  1.0, -1.0,
+         1.0,  1.0,  1.0,
+         1.0, -1.0,  1.0,
+        
+        // Left face
+        -1.0, -1.0, -1.0,
+        -1.0, -1.0,  1.0,
+        -1.0,  1.0,  1.0,
+        -1.0,  1.0, -1.0,
     ];
     _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), WebGLRenderingContext.STATIC_DRAW);
     
-    _squareVertexColorBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexColorBuffer);
-    
-    colors = new List();
-    for (int i=0; i < 4; i++) {
-      colors.addAll([0.5, 0.5, 1.0, 1.0]);
+    _cubeVertexColorBuffer = _gl.createBuffer();
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexColorBuffer);
+    colors = [
+        [1.0, 0.0, 0.0, 1.0],     // Front face
+        [1.0, 1.0, 0.0, 1.0],     // Back face
+        [0.0, 1.0, 0.0, 1.0],     // Top face
+        [1.0, 0.5, 0.5, 1.0],     // Bottom face
+        [1.0, 0.0, 1.0, 1.0],     // Right face
+        [0.0, 0.0, 1.0, 1.0],     // Left face
+    ];
+    List<double> unpackedColors = new List();
+    for (int i=0; i < colors.length; i++) {
+      var color = colors[i];
+      for (int j=0; j < 4; j++) {
+        unpackedColors.addAll(color);
+      }
     }
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(unpackedColors), WebGLRenderingContext.STATIC_DRAW);
     
+    _cubeVertexIndexBuffer = _gl.createBuffer();
+    _gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
+    List<int> _cubeVertexIndices = [
+         0,  1,  2,    0,  2,  3, // Front face
+         4,  5,  6,    4,  6,  7, // Back face
+         8,  9, 10,    8, 10, 11, // Top face
+        12, 13, 14,   12, 14, 15, // Bottom face
+        16, 17, 18,   16, 18, 19, // Right face
+        20, 21, 22,   20, 22, 23  // Left face
+    ];
+    _gl.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16Array.fromList(_cubeVertexIndices), WebGLRenderingContext.STATIC_DRAW);
   }
   
   void _setMatrixUniforms() {
@@ -214,20 +291,20 @@ class Lesson03 {
     
     // draw triangle
     _mvMatrix.identity();
-    _mvMatrix.translate(new Vector3.fromList([-1.5, 0.0, -7.0]));
+    _mvMatrix.translate(new Vector3.fromList([-1.5, 0.0, -8.0]));
     
     _mvPushMatrix();
-    _mvMatrix.rotate(_degToRad(_rTri), new Vector3.fromList([0, 1, 0]));
+    _mvMatrix.rotate(_degToRad(_rPyramid), new Vector3.fromList([0, 1, 0]));
     
     // verticies
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
-    _gl.vertexAttribPointer(_aVertexPosition, _dimensions, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _pyramidVertexPositionBuffer);
+    _gl.vertexAttribPointer(_aVertexPosition, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
     // color
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexColorBuffer);
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _pyramidVertexColorBuffer);
     _gl.vertexAttribPointer(_aVertexColor, 4, WebGLRenderingContext.FLOAT, false, 0, 0);
 
     _setMatrixUniforms();
-    _gl.drawArrays(WebGLRenderingContext.TRIANGLES, 0, 3); // triangles, start at 0, total 3
+    _gl.drawArrays(WebGLRenderingContext.TRIANGLES, 0, 12); // triangles, start at 0, total 3
     
     _mvPopMatrix();
     
@@ -236,24 +313,26 @@ class Lesson03 {
     _mvMatrix.translate(new Vector3.fromList([3.0, 0.0, 0.0]));
     
     _mvPushMatrix();
-    _mvMatrix.rotate(_degToRad(_rSquare), new Vector3.fromList([1, 0, 0]));
+    _mvMatrix.rotate(_degToRad(_rCube), new Vector3.fromList([1, 1, 1]));
     
     // verticies
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
-    _gl.vertexAttribPointer(_aVertexPosition, _dimensions, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
+    _gl.vertexAttribPointer(_aVertexPosition, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
     // color
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexColorBuffer);
+    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexColorBuffer);
     _gl.vertexAttribPointer(_aVertexColor, 4, WebGLRenderingContext.FLOAT, false, 0, 0);
 
+    _gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
     _setMatrixUniforms();
-    _gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4); // square, start at 0, total 4
+    _gl.drawElements(WebGLRenderingContext.TRIANGLES, 36, WebGLRenderingContext.UNSIGNED_SHORT, 0);
     
     _mvPopMatrix();
     
     // rotate
     int duration = time - _lastTime;
-    _rTri += (90 * duration) / 1000.0;
-    _rSquare += (75 * duration) / 1000.0;
+    _rPyramid += (90 * duration) / 1000.0;
+    _rCube += (75 * duration) / 1000.0;
+    
     _lastTime = time;
     
     // keep drawing
@@ -272,6 +351,6 @@ class Lesson03 {
 }
 
 void main() {
-  Lesson03 lesson = new Lesson03(document.query('#drawHere'));
+  Lesson04 lesson = new Lesson04(document.query('#drawHere'));
   lesson.start();
 }
