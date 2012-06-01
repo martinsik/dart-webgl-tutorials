@@ -6,6 +6,8 @@
 /**
  * based on:
  * http://learningwebgl.com/blog/?p=507
+ *
+ * NOTE: To run this example you have to open in on a webserver (url starting with http:// NOT file:///)!
  */
 class Lesson05 {
   
@@ -264,7 +266,7 @@ class Lesson05 {
     _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.array);
   }
   
-  void render(int time) {
+  bool render(int time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
     
@@ -306,7 +308,7 @@ class Lesson05 {
   
   void _animate(int timeNow) {
     if (_lastTime != 0) {
-        double elapsed = timeNow - _lastTime;
+        int elapsed = timeNow - _lastTime;
 
         _xRot += (90 * elapsed) / 1000.0;
         _yRot += (90 * elapsed) / 1000.0;

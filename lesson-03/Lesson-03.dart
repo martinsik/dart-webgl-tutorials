@@ -205,7 +205,7 @@ class Lesson03 {
     _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.array);
   }
   
-  void render(int time) {
+  bool render(int time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
     
