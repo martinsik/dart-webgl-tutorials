@@ -1,3 +1,0 @@
-[submodule "gl-matrix-dart"]
-	path = gl-matrix-dart
-	url = git://github.com/martinsik/gl-matrix-dart.git

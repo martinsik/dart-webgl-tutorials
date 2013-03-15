@@ -1,2 +1,4 @@
 *.dart.js
 *.dart.js_
+packages
+.settings

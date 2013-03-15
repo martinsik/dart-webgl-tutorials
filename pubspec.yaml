@@ -1,0 +1,7 @@
+name: dart_webgl_tutorials
+version: 0.1.0
+author: Martin Sikora
+homepage: http://martinsikora.com
+dependencies:
+  browser: any
+  vector_math: '>=0.9.6'

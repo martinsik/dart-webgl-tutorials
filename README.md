@@ -1,8 +1,7 @@
 ### Dart WebGL Tutorials
 
-Ported tutorials from learningwebgl.com
+Ported tutorials from [learningwebgl.com](www.learningwebgl.com)
 
-### Dartium
+I started fixing all tutorials to make them work with the latest Dart SDK. Also I swithed to a better math library [vector_math](http://pub.dartlang.org/packages/vector_math). 
 
-Some of these tutorials currently do NOT work in Dartium because there's probably some problem with `bindTexture` method.  
-Anyway, if you compile them into javascript everything should be fine.
+I should note that I'm not an expert on WebGL, I'm more familiar with standard OpenGL 3.2+ but if you have any problems try look at the original JavaScript lesson.
