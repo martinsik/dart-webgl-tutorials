@@ -1,6 +1,8 @@
-#import('dart:html');
+library lesson3;
 
-#import('../gl-matrix-dart/gl-matrix.dart');
+import 'dart:html';
+import 'package:vector_math/vector_math.dart';
+import 'dart:collection';
 
 /**
  * based on:
@@ -21,9 +23,9 @@ class Lesson03 {
   WebGLBuffer _squareVertexPositionBuffer;
   WebGLBuffer _squareVertexColorBuffer;
   
-  Matrix4 _pMatrix;
-  Matrix4 _mvMatrix;
-  Queue<Matrix4> _mvMatrixStack;
+  mat4 _pMatrix;
+  mat4 _mvMatrix;
+  Queue<mat4> _mvMatrixStack;
   
   int _aVertexPosition;
   int _aVertexColor;
@@ -32,7 +34,7 @@ class Lesson03 {
   
   double _rTri = 0.0;
   double _rSquare = 0.0;
-  int _lastTime = 0;
+  double _lastTime = 0.0;
   
   var _requestAnimationFrame;
   
@@ -42,21 +44,10 @@ class Lesson03 {
     _viewportHeight = canvas.height;
     _gl = canvas.getContext("experimental-webgl");
     
-    _mvMatrix = new Matrix4();
-    _pMatrix = new Matrix4();
     _mvMatrixStack = new Queue();
     
     _initShaders();
     _initBuffers();
-    
-    /*if (window.dynamic['requestAnimationFrame']) {
-      _requestAnimationFrame = window.requestAnimationFrame;
-    } else if (window.dynamic['webkitRequestAnimationFrame']) {
-      _requestAnimationFrame = window.webkitRequestAnimationFrame;
-    } else if (window.dynamic['mozRequestAnimationFrame']) {
-      _requestAnimationFrame = window.mozRequestAnimationFrame;
-    }*/
-    //_requestAnimationFrame = window.webkitRequestAnimationFrame;
     
     _gl.clearColor(0.0, 0.0, 0.0, 1.0);
     _gl.enable(WebGLRenderingContext.DEPTH_TEST);
@@ -201,23 +192,29 @@ class Lesson03 {
   }
   
   void _setMatrixUniforms() {
-    _gl.uniformMatrix4fv(_uPMatrix, false, _pMatrix.array);
-    _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.array);
+    // I hope this is temporary. Conversion fom mat4 to Float32Array.
+    Float32Array tmpFloat32 = new Float32Array(16);
+    
+    _pMatrix.copyIntoArray(tmpFloat32);
+    _gl.uniformMatrix4fv(_uPMatrix, false, tmpFloat32);
+    
+    _mvMatrix.copyIntoArray(tmpFloat32);
+    _gl.uniformMatrix4fv(_uMVMatrix, false, tmpFloat32);
   }
   
-  bool render(int time) {
+  bool render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
     
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
-    Matrix4.perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
+    _pMatrix = makePerspectiveMatrix(radians(45.0), _viewportWidth / _viewportHeight, 0.1, 100.0);
     
     // draw triangle
-    _mvMatrix.identity();
-    _mvMatrix.translate(new Vector3.fromList([-1.5, 0.0, -7.0]));
+    _mvMatrix = new mat4.identity();
+    _mvMatrix.translate(new vec3(-1.5, 0.0, -7.0));
     
     _mvPushMatrix();
-    _mvMatrix.rotate(_degToRad(_rTri), new Vector3.fromList([0, 1, 0]));
+    _mvMatrix.rotate(new vec3(0, 1, 0), radians(_rTri));
     
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
@@ -233,10 +230,10 @@ class Lesson03 {
     
     //print(_gl.getError());
     // draw square
-    _mvMatrix.translate(new Vector3.fromList([3.0, 0.0, 0.0]));
+    _mvMatrix.translate(new vec3(3.0, 0.0, 0.0));
     
     _mvPushMatrix();
-    _mvMatrix.rotate(_degToRad(_rSquare), new Vector3.fromList([1, 0, 0]));
+    _mvMatrix.rotate(new vec3(1, 0, 0), radians(_rSquare));
     
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
@@ -251,22 +248,21 @@ class Lesson03 {
     _mvPopMatrix();
     
     // rotate
-    int duration = time - _lastTime;
-    _rTri += (90 * duration) / 1000.0;
-    _rSquare += (75 * duration) / 1000.0;
+    double animationStep = time - _lastTime;
+    _rTri += (90 * animationStep) / 1000.0;
+    _rSquare += (75 * animationStep) / 1000.0;
     _lastTime = time;
     
     // keep drawing
-    window.webkitRequestAnimationFrame(this.render);
-  }
-  
-  double _degToRad(double degrees) {
-    return degrees * Math.PI / 180;
+    this._renderFrame();
   }
   
   void start() {
-    _lastTime = (new Date.now()).value;
-    window.webkitRequestAnimationFrame(this.render);
+    this._renderFrame();
+  }
+  
+  void _renderFrame() {
+    window.requestAnimationFrame((num time) { this.render(time); });
   }
   
 }
