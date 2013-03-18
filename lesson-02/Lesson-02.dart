@@ -1,6 +1,7 @@
-#import('dart:html');
+library lesson2;
 
-#import('../gl-matrix-dart/gl-matrix.dart');
+import 'dart:html';
+import 'package:vector_math/vector_math.dart';
 
 /**
  * based on:
@@ -21,8 +22,8 @@ class Lesson02 {
   WebGLBuffer _squareVertexPositionBuffer;
   WebGLBuffer _squareVertexColorBuffer;
   
-  Matrix4 _pMatrix;
-  Matrix4 _mvMatrix;
+  mat4 _pMatrix;
+  mat4 _mvMatrix;
   
   int _aVertexPosition;
   int _aVertexColor;
@@ -34,9 +35,6 @@ class Lesson02 {
     _viewportWidth = canvas.width;
     _viewportHeight = canvas.height;
     _gl = canvas.getContext("experimental-webgl");
-    
-    _mvMatrix = new Matrix4();
-    _pMatrix = new Matrix4();
     
     _initShaders();
     _initBuffers();
@@ -173,8 +171,14 @@ class Lesson02 {
   }
   
   void _setMatrixUniforms() {
-    _gl.uniformMatrix4fv(_uPMatrix, false, _pMatrix.array);
-    _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.array);
+    // I hope this is temporary. Conversion fom mat4 to Float32Array.
+    Float32Array tmpFloat32 = new Float32Array(16);
+    
+    _pMatrix.copyIntoArray(tmpFloat32);
+    _gl.uniformMatrix4fv(_uPMatrix, false, tmpFloat32);
+    
+    _mvMatrix.copyIntoArray(tmpFloat32);
+    _gl.uniformMatrix4fv(_uMVMatrix, false, tmpFloat32);
   }
   
   void render() {
@@ -182,11 +186,11 @@ class Lesson02 {
     _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
     
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
-    Matrix4.perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
+    _pMatrix = makePerspectiveMatrix(radians(45.0), _viewportWidth / _viewportHeight, 0.1, 100.0);
     
     // draw triangle
-    _mvMatrix.identity();
-    _mvMatrix.translate(new Vector3.fromList([-1.5, 0.0, -7.0]));
+    _mvMatrix = new mat4.identity();
+    _mvMatrix.translate(new vec3(-1.5, 0.0, -7.0));
     
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
@@ -198,10 +202,8 @@ class Lesson02 {
     _setMatrixUniforms();
     _gl.drawArrays(WebGLRenderingContext.TRIANGLES, 0, 3); // triangles, start at 0, total 3
     
-    
-    //print(_gl.getError());
     // draw square
-    _mvMatrix.translate(new Vector3.fromList([3.0, 0.0, 0.0]));
+    _mvMatrix.translate(new vec3(3.0, 0.0, 0.0));
     
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
@@ -220,5 +222,4 @@ class Lesson02 {
 void main() {
   Lesson02 lesson = new Lesson02(document.query('#drawHere'));
   lesson.render();
-  //window.setInterval(f() => lesson.render(), 30);
 }

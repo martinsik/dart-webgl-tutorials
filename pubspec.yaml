@@ -4,4 +4,4 @@ author: Martin Sikora
 homepage: http://martinsikora.com
 dependencies:
   browser: any
-  vector_math: '>=0.9.6'
+  vector_math: any

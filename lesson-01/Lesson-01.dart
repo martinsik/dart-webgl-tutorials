@@ -139,13 +139,14 @@ class Lesson01 {
   }
   
   void _setMatrixUniforms() {
-    Float32Array pMatrixF32A = new Float32Array(16);
-    _pMatrix.copyIntoArray(pMatrixF32A);
-    _gl.uniformMatrix4fv(_uPMatrix, false, pMatrixF32A);
+    // I hope this is temporary. Conversion fom mat4 to Float32Array.
+    Float32Array tmpFloat32 = new Float32Array(16);
     
-    Float32Array mvMatrixF32A = new Float32Array(16);
-    _mvMatrix.copyIntoArray(mvMatrixF32A);
-    _gl.uniformMatrix4fv(_uMVMatrix, false, mvMatrixF32A);
+    _pMatrix.copyIntoArray(tmpFloat32);
+    _gl.uniformMatrix4fv(_uPMatrix, false, tmpFloat32);
+    
+    _mvMatrix.copyIntoArray(tmpFloat32);
+    _gl.uniformMatrix4fv(_uMVMatrix, false, tmpFloat32);
   }
   
   void render() {
@@ -179,5 +180,4 @@ class Lesson01 {
 void main() {
   Lesson01 lesson = new Lesson01(document.query('#drawHere'));
   lesson.render();
-  //window.setInterval(f() => lesson.render(), 30);
 }

@@ -2,3 +2,4 @@
 *.dart.js_
 packages
 .settings
+pubspec.lock
