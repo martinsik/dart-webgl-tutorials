@@ -171,14 +171,13 @@ class Lesson02 {
   }
   
   void _setMatrixUniforms() {
-    // I hope this is temporary. Conversion fom mat4 to Float32Array.
-    Float32Array tmpFloat32 = new Float32Array(16);
+    List<double> tmpList = new List(16);
     
-    _pMatrix.copyIntoArray(tmpFloat32);
-    _gl.uniformMatrix4fv(_uPMatrix, false, tmpFloat32);
+    _pMatrix.copyIntoArray(tmpList);
+    _gl.uniformMatrix4fv(_uPMatrix, false, tmpList);
     
-    _mvMatrix.copyIntoArray(tmpFloat32);
-    _gl.uniformMatrix4fv(_uMVMatrix, false, tmpFloat32);
+    _mvMatrix.copyIntoArray(tmpList);
+    _gl.uniformMatrix4fv(_uMVMatrix, false, tmpList);
   }
   
   void render() {
