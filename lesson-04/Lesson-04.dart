@@ -1,7 +1,8 @@
-#import('dart:html');
+library lesson4;
 
-#import('../gl-matrix-dart/gl-matrix.dart');
-
+import 'dart:html';
+import 'package:vector_math/vector_math.dart';
+import 'dart:collection';
 
 /**
  * based on:
@@ -22,9 +23,9 @@ class Lesson04 {
   WebGLBuffer _cubeVertexColorBuffer;
   WebGLBuffer _cubeVertexIndexBuffer;
   
-  Matrix4 _pMatrix;
-  Matrix4 _mvMatrix;
-  Queue<Matrix4> _mvMatrixStack;
+  mat4 _pMatrix;
+  mat4 _mvMatrix;
+  Queue<mat4> _mvMatrixStack;
   
   int _aVertexPosition;
   int _aVertexColor;
@@ -33,7 +34,7 @@ class Lesson04 {
   
   double _rPyramid = 0.0;
   double _rCube = 0.0;
-  int _lastTime = 0;
+  double _lastTime = 0.0;
   
   
   Lesson04(CanvasElement canvas) {
@@ -41,8 +42,6 @@ class Lesson04 {
     _viewportHeight = canvas.height;
     _gl = canvas.getContext("experimental-webgl");
     
-    _mvMatrix = new Matrix4();
-    _pMatrix = new Matrix4();
     _mvMatrixStack = new Queue();
     
     _initShaders();
@@ -149,7 +148,8 @@ class Lesson04 {
   
   void _initBuffers() {
     // variables to store verticies and colors
-    List<double> vertices, colors;
+    List<double> vertices;
+//    List<List<double>> colors;
     
     // create triangle
     _pyramidVertexPositionBuffer = _gl.createBuffer();
@@ -178,7 +178,7 @@ class Lesson04 {
      
     _pyramidVertexColorBuffer = _gl.createBuffer();
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _pyramidVertexColorBuffer);
-    colors = [
+    List<double> colors1 = [
         // Front face
         1.0, 0.0, 0.0, 1.0,
         0.0, 1.0, 0.0, 1.0,
@@ -196,7 +196,7 @@ class Lesson04 {
         0.0, 0.0, 1.0, 1.0,
         0.0, 1.0, 0.0, 1.0
     ];
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors1), WebGLRenderingContext.STATIC_DRAW);
     
     
     // create square
@@ -245,7 +245,7 @@ class Lesson04 {
     
     _cubeVertexColorBuffer = _gl.createBuffer();
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexColorBuffer);
-    colors = [
+    List<List<double>> colors2 = [
         [1.0, 0.0, 0.0, 1.0],     // Front face
         [1.0, 1.0, 0.0, 1.0],     // Back face
         [0.0, 1.0, 0.0, 1.0],     // Top face
@@ -253,13 +253,11 @@ class Lesson04 {
         [1.0, 0.0, 1.0, 1.0],     // Right face
         [0.0, 0.0, 1.0, 1.0],     // Left face
     ];
-    List<double> unpackedColors = new List();
-    for (int i=0; i < colors.length; i++) {
-      var color = colors[i];
-      for (int j=0; j < 4; j++) {
-        unpackedColors.addAll(color);
-      }
-    }
+    // each cube face (6 faces for one cube) consists of 4 points of the same color where each color has 4 components RGBA
+    // therefore I need 4 * 4 * 6 long list of doubles
+    List<double> unpackedColors = new List.generate(4 * 4 * colors2.length, (int index) {
+      return colors2[index ~/ 16][index % 4];
+    }, growable: false);
     _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(unpackedColors), WebGLRenderingContext.STATIC_DRAW);
     
     _cubeVertexIndexBuffer = _gl.createBuffer();
@@ -276,24 +274,30 @@ class Lesson04 {
   }
   
   void _setMatrixUniforms() {
-    _gl.uniformMatrix4fv(_uPMatrix, false, _pMatrix.array);
-    _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.array);
+    List<double> tmpList = new List(16);
+    
+    _pMatrix.copyIntoArray(tmpList);
+    _gl.uniformMatrix4fv(_uPMatrix, false, tmpList);
+    
+    _mvMatrix.copyIntoArray(tmpList);
+    _gl.uniformMatrix4fv(_uMVMatrix, false, tmpList);
+
   }
   
   
-  bool render(int time) {
+  bool render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
     
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
-    Matrix4.perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
+    _pMatrix = makePerspectiveMatrix(radians(45.0), _viewportWidth / _viewportHeight, 0.1, 100.0);
     
     // draw triangle
-    _mvMatrix.identity();
-    _mvMatrix.translate(new Vector3.fromList([-1.5, 0.0, -8.0]));
+    _mvMatrix = new mat4.identity();
+    _mvMatrix.translate(new vec3(-1.5, 0.0, -8.0));
     
     _mvPushMatrix();
-    _mvMatrix.rotate(_degToRad(_rPyramid), new Vector3.fromList([0, 1, 0]));
+    _mvMatrix.rotate(new vec3(0, 1, 0), radians(_rPyramid));
     
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _pyramidVertexPositionBuffer);
@@ -307,12 +311,11 @@ class Lesson04 {
     
     _mvPopMatrix();
     
-    //print(_gl.getError());
     // draw square
-    _mvMatrix.translate(new Vector3.fromList([3.0, 0.0, 0.0]));
+    _mvMatrix.translate(new vec3(3.0, 0.0, 0.0));
     
     _mvPushMatrix();
-    _mvMatrix.rotate(_degToRad(_rCube), new Vector3.fromList([1, 1, 1]));
+    _mvMatrix.rotate(new vec3(1, 1, 1), radians(_rCube));
     
     // verticies
     _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
@@ -328,23 +331,22 @@ class Lesson04 {
     _mvPopMatrix();
     
     // rotate
-    int duration = time - _lastTime;
-    _rPyramid += (90 * duration) / 1000.0;
-    _rCube += (75 * duration) / 1000.0;
-    
+    double animationStep = time - _lastTime;
+    _rPyramid += (90 * animationStep) / 1000.0;
+    _rCube += (75 * animationStep) / 1000.0;
     _lastTime = time;
     
     // keep drawing
-    window.webkitRequestAnimationFrame(this.render);
+    this._renderFrame();
   }
   
-  double _degToRad(double degrees) {
-    return degrees * Math.PI / 180;
-  }
   
   void start() {
-    _lastTime = (new Date.now()).value;
-    window.webkitRequestAnimationFrame(this.render);
+    this._renderFrame();
+  }
+  
+  void _renderFrame() {
+    window.requestAnimationFrame((num time) { this.render(time); });
   }
   
 }
