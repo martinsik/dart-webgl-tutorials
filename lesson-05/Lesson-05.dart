@@ -1,6 +1,9 @@
-#import('dart:html');
+library lesson5;
 
-#import('../gl-matrix-dart/gl-matrix.dart');
+import('dart:html');
+import 'package:vector_math/vector_math.dart';
+import 'dart:collection';
+import 'dart:web_gl' as webgl;
 
 
 /**
@@ -12,15 +15,15 @@
 class Lesson05 {
   
   CanvasElement _canvas;
-  WebGLRenderingContext _gl;
-  WebGLProgram _shaderProgram;
+  webgl.RenderingContext _gl;
+  webgl.Program _shaderProgram;
   int _viewportWidth, _viewportHeight;
   
-  WebGLTexture _neheTexture;
+  webgl.Texture _neheTexture;
   
-  WebGLBuffer _cubeVertexTextureCoordBuffer;
-  WebGLBuffer _cubeVertexPositionBuffer;
-  WebGLBuffer _cubeVertexIndexBuffer;
+  webgl.Buffer _cubeVertexTextureCoordBuffer;
+  webgl.Buffer _cubeVertexPositionBuffer;
+  webgl.Buffer _cubeVertexIndexBuffer;
   
   Matrix4 _pMatrix;
   Matrix4 _mvMatrix;
@@ -28,9 +31,9 @@ class Lesson05 {
   
   int _aVertexPosition;
   int _aTextureCoord;
-  WebGLUniformLocation _uPMatrix;
-  WebGLUniformLocation _uMVMatrix;
-  WebGLUniformLocation _samplerUniform;
+  webgl.UniformLocation _uPMatrix;
+  webgl.UniformLocation _uMVMatrix;
+  webgl.UniformLocation _samplerUniform;
   
   double _xRot = 0.0, _yRot = 0.0, _zRot = 0.0;
   int _lastTime = 0;
@@ -60,7 +63,7 @@ class Lesson05 {
     //_requestAnimationFrame = window.webkitRequestAnimationFrame;
     
     _gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    _gl.enable(WebGLRenderingContext.DEPTH_TEST);
+    _gl.enable(webgl.RenderingContext.DEPTH_TEST);
   }
   
 
@@ -97,12 +100,12 @@ class Lesson05 {
     """;
     
     // vertex shader compilation
-    WebGLShader vs = _gl.createShader(WebGLRenderingContext.VERTEX_SHADER);
+    webgl.Shader vs = _gl.createShader(webgl.RenderingContext.VERTEX_SHADER);
     _gl.shaderSource(vs, vsSource);
     _gl.compileShader(vs);
     
     // fragment shader compilation
-    WebGLShader fs = _gl.createShader(WebGLRenderingContext.FRAGMENT_SHADER);
+    webgl.Shader fs = _gl.createShader(webgl.RenderingContext.FRAGMENT_SHADER);
     _gl.shaderSource(fs, fsSource);
     _gl.compileShader(fs);
     
@@ -117,15 +120,15 @@ class Lesson05 {
      * Check if shaders were compiled properly. This is probably the most painful part
      * since there's no way to "debug" shader compilation
      */
-    if (!_gl.getShaderParameter(vs, WebGLRenderingContext.COMPILE_STATUS)) { 
+    if (!_gl.getShaderParameter(vs, webgl.RenderingContext.COMPILE_STATUS)) { 
       print(_gl.getShaderInfoLog(vs));
     }
     
-    if (!_gl.getShaderParameter(fs, WebGLRenderingContext.COMPILE_STATUS)) { 
+    if (!_gl.getShaderParameter(fs, webgl.RenderingContext.COMPILE_STATUS)) { 
       print(_gl.getShaderInfoLog(fs));
     }
     
-    if (!_gl.getProgramParameter(_shaderProgram, WebGLRenderingContext.LINK_STATUS)) { 
+    if (!_gl.getProgramParameter(_shaderProgram, webgl.RenderingContext.LINK_STATUS)) { 
       print(_gl.getProgramInfoLog(_shaderProgram));
     }
     
@@ -148,7 +151,7 @@ class Lesson05 {
     
     // create square
     _cubeVertexPositionBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
     // fill "current buffer" with triangle verticies
     vertices = [
         // Front face
@@ -187,10 +190,10 @@ class Lesson05 {
         -1.0,  1.0,  1.0,
         -1.0,  1.0, -1.0,
     ];
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
     
     _cubeVertexTextureCoordBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexTextureCoordBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _cubeVertexTextureCoordBuffer);
     textureCoords = [
         // Front face
         0.0, 0.0,
@@ -228,10 +231,10 @@ class Lesson05 {
         1.0, 1.0,
         0.0, 1.0,
     ];
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(textureCoords), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(textureCoords), webgl.RenderingContext.STATIC_DRAW);
     
     _cubeVertexIndexBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
     List<int> _cubeVertexIndices = [
          0,  1,  2,    0,  2,  3, // Front face
          4,  5,  6,    4,  6,  7, // Back face
@@ -240,7 +243,7 @@ class Lesson05 {
         16, 17, 18,   16, 18, 19, // Right face
         20, 21, 22,   20, 22, 23  // Left face
     ];
-    _gl.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16Array.fromList(_cubeVertexIndices), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16Array.fromList(_cubeVertexIndices), webgl.RenderingContext.STATIC_DRAW);
   }
   
   void _initTexture() {
@@ -252,13 +255,13 @@ class Lesson05 {
     image.src = "nehe.gif";
   }
   
-  void _handleLoadedTexture(WebGLTexture texture, ImageElement img) {
-    _gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture);
-    _gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, 1); // second argument must be an int
-    _gl.texImage2D(WebGLRenderingContext.TEXTURE_2D, 0, WebGLRenderingContext.RGBA, WebGLRenderingContext.RGBA, WebGLRenderingContext.UNSIGNED_BYTE, img);
-    _gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MAG_FILTER, WebGLRenderingContext.NEAREST);
-    _gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MIN_FILTER, WebGLRenderingContext.NEAREST);
-    _gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, null);
+  void _handleLoadedTexture(webgl.Texture texture, ImageElement img) {
+    _gl.bindTexture(webgl.RenderingContext.TEXTURE_2D, texture);
+    _gl.pixelStorei(webgl.RenderingContext.UNPACK_FLIP_Y_WEBGL, 1); // second argument must be an int
+    _gl.texImage2D(webgl.RenderingContext.TEXTURE_2D, 0, webgl.RenderingContext.RGBA, webgl.RenderingContext.RGBA, webgl.RenderingContext.UNSIGNED_BYTE, img);
+    _gl.texParameteri(webgl.RenderingContext.TEXTURE_2D, webgl.RenderingContext.TEXTURE_MAG_FILTER, webgl.RenderingContext.NEAREST);
+    _gl.texParameteri(webgl.RenderingContext.TEXTURE_2D, webgl.RenderingContext.TEXTURE_MIN_FILTER, webgl.RenderingContext.NEAREST);
+    _gl.bindTexture(webgl.RenderingContext.TEXTURE_2D, null);
   }
   
   void _setMatrixUniforms() {
@@ -268,7 +271,7 @@ class Lesson05 {
   
   bool render(int time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
-    _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    _gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
     
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
     Matrix4.perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
@@ -283,21 +286,21 @@ class Lesson05 {
     _mvMatrix.rotate(_degToRad(_zRot), new Vector3.fromList([0, 0, 1]));
     
     // verticies
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
-    _gl.vertexAttribPointer(_aVertexPosition, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
+    _gl.vertexAttribPointer(_aVertexPosition, 3, webgl.RenderingContext.FLOAT, false, 0, 0);
     
     // texture
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _cubeVertexTextureCoordBuffer);
-    _gl.vertexAttribPointer(_aTextureCoord, 2, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _cubeVertexTextureCoordBuffer);
+    _gl.vertexAttribPointer(_aTextureCoord, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
 
-    _gl.activeTexture(WebGLRenderingContext.TEXTURE0);
-    _gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, _neheTexture);
+    _gl.activeTexture(webgl.RenderingContext.TEXTURE0);
+    _gl.bindTexture(webgl.RenderingContext.TEXTURE_2D, _neheTexture);
     _gl.uniform1i(_samplerUniform, 0);
 
     
-    _gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
     _setMatrixUniforms();
-    _gl.drawElements(WebGLRenderingContext.TRIANGLES, 36, WebGLRenderingContext.UNSIGNED_SHORT, 0);
+    _gl.drawElements(webgl.RenderingContext.TRIANGLES, 36, webgl.RenderingContext.UNSIGNED_SHORT, 0);
     
     // rotate
     _animate(time);

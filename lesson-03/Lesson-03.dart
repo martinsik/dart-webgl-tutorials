@@ -3,6 +3,7 @@ library lesson3;
 import 'dart:html';
 import 'package:vector_math/vector_math.dart';
 import 'dart:collection';
+import 'dart:web_gl' as webgl;
 
 /**
  * based on:
@@ -11,17 +12,17 @@ import 'dart:collection';
 class Lesson03 {
   
   CanvasElement _canvas;
-  WebGLRenderingContext _gl;
-  WebGLProgram _shaderProgram;
+  webgl.RenderingContext _gl;
+  webgl.Program _shaderProgram;
   int _dimensions = 3;
   int _viewportWidth;
   int _viewportHeight;
   
-  WebGLBuffer _triangleVertexPositionBuffer;
-  WebGLBuffer _triangleVertexColorBuffer;
+  webgl.Buffer _triangleVertexPositionBuffer;
+  webgl.Buffer _triangleVertexColorBuffer;
   
-  WebGLBuffer _squareVertexPositionBuffer;
-  WebGLBuffer _squareVertexColorBuffer;
+  webgl.Buffer _squareVertexPositionBuffer;
+  webgl.Buffer _squareVertexColorBuffer;
   
   mat4 _pMatrix;
   mat4 _mvMatrix;
@@ -29,8 +30,8 @@ class Lesson03 {
   
   int _aVertexPosition;
   int _aVertexColor;
-  WebGLUniformLocation _uPMatrix;
-  WebGLUniformLocation _uMVMatrix;
+  webgl.UniformLocation _uPMatrix;
+  webgl.UniformLocation _uMVMatrix;
   
   double _rTri = 0.0;
   double _rSquare = 0.0;
@@ -50,7 +51,7 @@ class Lesson03 {
     _initBuffers();
     
     _gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    _gl.enable(WebGLRenderingContext.DEPTH_TEST);
+    _gl.enable(webgl.RenderingContext.DEPTH_TEST);
   }
   
   void _mvPushMatrix() {
@@ -96,12 +97,12 @@ class Lesson03 {
     """;
     
     // vertex shader compilation
-    WebGLShader vs = _gl.createShader(WebGLRenderingContext.VERTEX_SHADER);
+    webgl.Shader vs = _gl.createShader(webgl.RenderingContext.VERTEX_SHADER);
     _gl.shaderSource(vs, vsSource);
     _gl.compileShader(vs);
     
     // fragment shader compilation
-    WebGLShader fs = _gl.createShader(WebGLRenderingContext.FRAGMENT_SHADER);
+    webgl.Shader fs = _gl.createShader(webgl.RenderingContext.FRAGMENT_SHADER);
     _gl.shaderSource(fs, fsSource);
     _gl.compileShader(fs);
     
@@ -116,15 +117,15 @@ class Lesson03 {
      * Check if shaders were compiled properly. This is probably the most painful part
      * since there's no way to "debug" shader compilation
      */
-    if (!_gl.getShaderParameter(vs, WebGLRenderingContext.COMPILE_STATUS)) { 
+    if (!_gl.getShaderParameter(vs, webgl.RenderingContext.COMPILE_STATUS)) { 
       print(_gl.getShaderInfoLog(vs));
     }
     
-    if (!_gl.getShaderParameter(fs, WebGLRenderingContext.COMPILE_STATUS)) { 
+    if (!_gl.getShaderParameter(fs, webgl.RenderingContext.COMPILE_STATUS)) { 
       print(_gl.getShaderInfoLog(fs));
     }
     
-    if (!_gl.getProgramParameter(_shaderProgram, WebGLRenderingContext.LINK_STATUS)) { 
+    if (!_gl.getProgramParameter(_shaderProgram, webgl.RenderingContext.LINK_STATUS)) { 
       print(_gl.getProgramInfoLog(_shaderProgram));
     }
     
@@ -145,7 +146,7 @@ class Lesson03 {
     
     // create triangle
     _triangleVertexPositionBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
     
     // fill "current buffer" with triangle verticies
     vertices = [
@@ -153,23 +154,23 @@ class Lesson03 {
       -1.0, -1.0,  0.0,
        1.0, -1.0,  0.0
     ];
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
      
     _triangleVertexColorBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexColorBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _triangleVertexColorBuffer);
     colors = [
         1.0, 0.0, 0.0, 1.0,
         0.0, 1.0, 0.0, 1.0,
         0.0, 0.0, 1.0, 1.0
     ];
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), webgl.RenderingContext.STATIC_DRAW);
     
     //_triangleVertexPositionBuffer.itemSize = 3;
     //_triangleVertexPositionBuffer.numItems = 3;
     
     // create square
     _squareVertexPositionBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
         
     // fill "current buffer" with triangle verticies
     vertices = [
@@ -178,16 +179,16 @@ class Lesson03 {
          1.0, -1.0,  0.0,
         -1.0, -1.0,  0.0
     ];
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
     
     _squareVertexColorBuffer = _gl.createBuffer();
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexColorBuffer);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _squareVertexColorBuffer);
     
     colors = new List();
     for (int i=0; i < 4; i++) {
       colors.addAll([0.5, 0.5, 1.0, 1.0]);
     }
-    _gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), WebGLRenderingContext.STATIC_DRAW);
+    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), webgl.RenderingContext.STATIC_DRAW);
     
   }
   
@@ -203,7 +204,7 @@ class Lesson03 {
   
   bool render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
-    _gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    _gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
     
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
     _pMatrix = makePerspectiveMatrix(radians(45.0), _viewportWidth / _viewportHeight, 0.1, 100.0);
@@ -216,14 +217,14 @@ class Lesson03 {
     _mvMatrix.rotate(new vec3(0, 1, 0), radians(_rTri));
     
     // verticies
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
-    _gl.vertexAttribPointer(_aVertexPosition, _dimensions, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _triangleVertexPositionBuffer);
+    _gl.vertexAttribPointer(_aVertexPosition, _dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
     // color
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _triangleVertexColorBuffer);
-    _gl.vertexAttribPointer(_aVertexColor, 4, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _triangleVertexColorBuffer);
+    _gl.vertexAttribPointer(_aVertexColor, 4, webgl.RenderingContext.FLOAT, false, 0, 0);
 
     _setMatrixUniforms();
-    _gl.drawArrays(WebGLRenderingContext.TRIANGLES, 0, 3); // triangles, start at 0, total 3
+    _gl.drawArrays(webgl.RenderingContext.TRIANGLES, 0, 3); // triangles, start at 0, total 3
     
     _mvPopMatrix();
     
@@ -235,14 +236,14 @@ class Lesson03 {
     _mvMatrix.rotate(new vec3(1, 0, 0), radians(_rSquare));
     
     // verticies
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
-    _gl.vertexAttribPointer(_aVertexPosition, _dimensions, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _squareVertexPositionBuffer);
+    _gl.vertexAttribPointer(_aVertexPosition, _dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
     // color
-    _gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, _squareVertexColorBuffer);
-    _gl.vertexAttribPointer(_aVertexColor, 4, WebGLRenderingContext.FLOAT, false, 0, 0);
+    _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _squareVertexColorBuffer);
+    _gl.vertexAttribPointer(_aVertexColor, 4, webgl.RenderingContext.FLOAT, false, 0, 0);
 
     _setMatrixUniforms();
-    _gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4); // square, start at 0, total 4
+    _gl.drawArrays(webgl.RenderingContext.TRIANGLE_STRIP, 0, 4); // square, start at 0, total 4
     
     _mvPopMatrix();
     
