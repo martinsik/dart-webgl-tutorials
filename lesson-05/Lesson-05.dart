@@ -1,6 +1,6 @@
 library lesson5;
 
-import('dart:html');
+import 'dart:html';
 import 'package:vector_math/vector_math.dart';
 import 'dart:collection';
 import 'dart:web_gl' as webgl;
@@ -25,9 +25,9 @@ class Lesson05 {
   webgl.Buffer _cubeVertexPositionBuffer;
   webgl.Buffer _cubeVertexIndexBuffer;
   
-  Matrix4 _pMatrix;
-  Matrix4 _mvMatrix;
-  Queue<Matrix4> _mvMatrixStack;
+  mat4 _pMatrix;
+  mat4 _mvMatrix;
+  Queue<mat4> _mvMatrixStack;
   
   int _aVertexPosition;
   int _aTextureCoord;
@@ -35,8 +35,10 @@ class Lesson05 {
   webgl.UniformLocation _uMVMatrix;
   webgl.UniformLocation _samplerUniform;
   
-  double _xRot = 0.0, _yRot = 0.0, _zRot = 0.0;
-  int _lastTime = 0;
+  double _xRot = 0.0;
+  double _yRot = 0.0;
+  double _zRot = 0.0;
+  double _lastTime = 0.0;
   
   var _requestAnimationFrame;
   
@@ -46,21 +48,12 @@ class Lesson05 {
     _viewportHeight = canvas.height;
     _gl = canvas.getContext("experimental-webgl");
     
-    _mvMatrix = new Matrix4();
-    _pMatrix = new Matrix4();
+    _mvMatrix = new mat4();
+    _pMatrix = new mat4();
     
     _initShaders();
     _initBuffers();
     _initTexture();
-    
-    /*if (window.dynamic['requestAnimationFrame']) {
-      _requestAnimationFrame = window.requestAnimationFrame;
-    } else if (window.dynamic['webkitRequestAnimationFrame']) {
-      _requestAnimationFrame = window.webkitRequestAnimationFrame;
-    } else if (window.dynamic['mozRequestAnimationFrame']) {
-      _requestAnimationFrame = window.mozRequestAnimationFrame;
-    }*/
-    //_requestAnimationFrame = window.webkitRequestAnimationFrame;
     
     _gl.clearColor(0.0, 0.0, 0.0, 1.0);
     _gl.enable(webgl.RenderingContext.DEPTH_TEST);
@@ -147,7 +140,6 @@ class Lesson05 {
   void _initBuffers() {
     // variables to store verticies, tecture coordinates and colors
     List<double> vertices, textureCoords, colors;
-    
     
     // create square
     _cubeVertexPositionBuffer = _gl.createBuffer();
@@ -249,7 +241,7 @@ class Lesson05 {
   void _initTexture() {
     _neheTexture = _gl.createTexture();
     ImageElement image = new Element.tag('img');
-    image.on.load.add((e) {
+    image.onLoad.listen((e) {
       _handleLoadedTexture(_neheTexture, image);
     });
     image.src = "nehe.gif";
@@ -265,25 +257,29 @@ class Lesson05 {
   }
   
   void _setMatrixUniforms() {
-    _gl.uniformMatrix4fv(_uPMatrix, false, _pMatrix.array);
-    _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.array);
+    List<double> tmpList = new List(16);
+    
+    _pMatrix.copyIntoArray(tmpList);
+    _gl.uniformMatrix4fv(_uPMatrix, false, tmpList);
+    
+    _mvMatrix.copyIntoArray(tmpList);
+    _gl.uniformMatrix4fv(_uMVMatrix, false, tmpList);
   }
   
-  bool render(int time) {
+  bool render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
     
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
-    Matrix4.perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
+//    Matrix4.perspective(45, _viewportWidth / _viewportHeight, 0.1, 100.0, _pMatrix);
+    _pMatrix = makePerspectiveMatrix(radians(45.0), _viewportWidth / _viewportHeight, 0.1, 100.0);
     
-    // draw triangle
-    _mvMatrix.identity();
+    _mvMatrix = new mat4.identity();
+    _mvMatrix.translate(new vec3(0.0, 0.0, -5.0));
 
-    _mvMatrix.translate(new Vector3.fromList([0.0, 0.0, -5.0]));
-
-    _mvMatrix.rotate(_degToRad(_xRot), new Vector3.fromList([1, 0, 0]));
-    _mvMatrix.rotate(_degToRad(_yRot), new Vector3.fromList([0, 1, 0]));
-    _mvMatrix.rotate(_degToRad(_zRot), new Vector3.fromList([0, 0, 1]));
+    _mvMatrix.rotate(new vec3(1, 0, 0), radians(_xRot));
+    _mvMatrix.rotate(new vec3(0, 1, 0), radians(_yRot));
+    _mvMatrix.rotate(new vec3(0, 0, 1), radians(_zRot));
     
     // verticies
     _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _cubeVertexPositionBuffer);
@@ -306,27 +302,26 @@ class Lesson05 {
     _animate(time);
     
     // keep drawing
-    window.webkitRequestAnimationFrame(this.render);
-  }
-  
-  void _animate(int timeNow) {
-    if (_lastTime != 0) {
-        int elapsed = timeNow - _lastTime;
-
-        _xRot += (90 * elapsed) / 1000.0;
-        _yRot += (90 * elapsed) / 1000.0;
-        _zRot += (90 * elapsed) / 1000.0;
-    }
-    _lastTime = timeNow;
-  }
-  
-  double _degToRad(double degrees) {
-    return degrees * Math.PI / 180;
+    this._renderFrame();
   }
   
   void start() {
-    _lastTime = (new Date.now()).value;
-    window.webkitRequestAnimationFrame(this.render);
+    this._renderFrame();
+  }
+  
+  void _renderFrame() {
+    window.requestAnimationFrame((num time) { this.render(time); });
+  }
+  
+  void _animate(double time) {
+    if (_lastTime != 0) {
+        double animationStep = time - _lastTime;
+
+        _xRot += (90 * animationStep) / 1000.0;
+        _yRot += (90 * animationStep) / 1000.0;
+        _zRot += (90 * animationStep) / 1000.0;
+    }
+    _lastTime = time;
   }
   
 }
