@@ -1,6 +1,6 @@
 ### Dart WebGL Tutorials
 
-Ported tutorials from [learningwebgl.com](www.learningwebgl.com)
+Ported tutorials from [learningwebgl.com](http://www.learningwebgl.com)
 
 I started fixing all tutorials to make them work with the latest Dart SDK. Also, I switched to a better math library [vector_math](http://pub.dartlang.org/packages/vector_math). 
 
