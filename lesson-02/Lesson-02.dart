@@ -3,6 +3,7 @@ library lesson2;
 import 'dart:html';
 import 'package:vector_math/vector_math.dart';
 import 'dart:web_gl' as webgl;
+import 'dart:typed_data';
 
 /**
  * based on:
@@ -133,7 +134,7 @@ class Lesson02 {
       -1.0, -1.0,  0.0,
        1.0, -1.0,  0.0
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
      
     _triangleVertexColorBuffer = _gl.createBuffer();
     _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _triangleVertexColorBuffer);
@@ -142,7 +143,7 @@ class Lesson02 {
         0.0, 1.0, 0.0, 1.0,
         0.0, 0.0, 1.0, 1.0
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(colors), webgl.RenderingContext.STATIC_DRAW);
     
     //_triangleVertexPositionBuffer.itemSize = 3;
     //_triangleVertexPositionBuffer.numItems = 3;
@@ -158,7 +159,7 @@ class Lesson02 {
          1.0, -1.0,  0.0,
         -1.0, -1.0,  0.0
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
     
     _squareVertexColorBuffer = _gl.createBuffer();
     _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _squareVertexColorBuffer);
@@ -167,12 +168,12 @@ class Lesson02 {
     for (int i=0; i < 4; i++) {
       colors.addAll([0.5, 0.5, 1.0, 1.0]);
     }
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(colors), webgl.RenderingContext.STATIC_DRAW);
     
   }
   
   void _setMatrixUniforms() {
-    List<double> tmpList = new List(16);
+    Float32List tmpList = new Float32List(16);
     
     _pMatrix.copyIntoArray(tmpList);
     _gl.uniformMatrix4fv(_uPMatrix, false, tmpList);

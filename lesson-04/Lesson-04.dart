@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:vector_math/vector_math.dart';
 import 'dart:collection';
 import 'dart:web_gl' as webgl;
+import 'dart:typed_data';
 
 /**
  * based on:
@@ -175,7 +176,7 @@ class Lesson04 {
        -1.0, -1.0, -1.0,
        -1.0, -1.0,  1.0
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
      
     _pyramidVertexColorBuffer = _gl.createBuffer();
     _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _pyramidVertexColorBuffer);
@@ -197,7 +198,7 @@ class Lesson04 {
         0.0, 0.0, 1.0, 1.0,
         0.0, 1.0, 0.0, 1.0
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(colors1), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(colors1), webgl.RenderingContext.STATIC_DRAW);
     
     
     // create square
@@ -242,7 +243,7 @@ class Lesson04 {
         -1.0,  1.0,  1.0,
         -1.0,  1.0, -1.0,
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
     
     _cubeVertexColorBuffer = _gl.createBuffer();
     _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _cubeVertexColorBuffer);
@@ -261,7 +262,7 @@ class Lesson04 {
       // index % 4 returns 0-3 that's color component for each color
       return colors2[index ~/ 16][index % 4];
     }, growable: false);
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(unpackedColors), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(unpackedColors), webgl.RenderingContext.STATIC_DRAW);
     
     _cubeVertexIndexBuffer = _gl.createBuffer();
     _gl.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
@@ -273,11 +274,11 @@ class Lesson04 {
         16, 17, 18,   16, 18, 19, // Right face
         20, 21, 22,   20, 22, 23  // Left face
     ];
-    _gl.bufferData(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16Array.fromList(_cubeVertexIndices), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16List.fromList(_cubeVertexIndices), webgl.RenderingContext.STATIC_DRAW);
   }
   
   void _setMatrixUniforms() {
-    List<double> tmpList = new List(16);
+    Float32List tmpList = new Float32List(16);
     
     _pMatrix.copyIntoArray(tmpList);
     _gl.uniformMatrix4fv(_uPMatrix, false, tmpList);

@@ -4,7 +4,7 @@ import 'dart:html';
 import 'package:vector_math/vector_math.dart';
 import 'dart:collection';
 import 'dart:web_gl' as webgl;
-
+import 'dart:typed_data';
 
 /**
  * based on:
@@ -41,7 +41,6 @@ class Lesson05 {
   double _lastTime = 0.0;
   
   var _requestAnimationFrame;
-  
   
   Lesson05(CanvasElement canvas) {
     _viewportWidth = canvas.width;
@@ -182,7 +181,7 @@ class Lesson05 {
         -1.0,  1.0,  1.0,
         -1.0,  1.0, -1.0,
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(vertices), webgl.RenderingContext.STATIC_DRAW);
     
     _cubeVertexTextureCoordBuffer = _gl.createBuffer();
     _gl.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, _cubeVertexTextureCoordBuffer);
@@ -223,7 +222,7 @@ class Lesson05 {
         1.0, 1.0,
         0.0, 1.0,
     ];
-    _gl.bufferData(webgl.RenderingContext.ARRAY_BUFFER, new Float32Array.fromList(textureCoords), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(textureCoords), webgl.RenderingContext.STATIC_DRAW);
     
     _cubeVertexIndexBuffer = _gl.createBuffer();
     _gl.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
@@ -235,7 +234,7 @@ class Lesson05 {
         16, 17, 18,   16, 18, 19, // Right face
         20, 21, 22,   20, 22, 23  // Left face
     ];
-    _gl.bufferData(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16Array.fromList(_cubeVertexIndices), webgl.RenderingContext.STATIC_DRAW);
+    _gl.bufferDataTyped(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16List.fromList(_cubeVertexIndices), webgl.RenderingContext.STATIC_DRAW);
   }
   
   void _initTexture() {
@@ -243,6 +242,8 @@ class Lesson05 {
     ImageElement image = new Element.tag('img');
     image.onLoad.listen((e) {
       _handleLoadedTexture(_neheTexture, image);
+      // start rendering when texture is loaded
+      this.start();
     });
     image.src = "nehe.gif";
   }
@@ -250,14 +251,14 @@ class Lesson05 {
   void _handleLoadedTexture(webgl.Texture texture, ImageElement img) {
     _gl.bindTexture(webgl.RenderingContext.TEXTURE_2D, texture);
     _gl.pixelStorei(webgl.RenderingContext.UNPACK_FLIP_Y_WEBGL, 1); // second argument must be an int
-    _gl.texImage2D(webgl.RenderingContext.TEXTURE_2D, 0, webgl.RenderingContext.RGBA, webgl.RenderingContext.RGBA, webgl.RenderingContext.UNSIGNED_BYTE, img);
+    _gl.texImage2DImage(webgl.RenderingContext.TEXTURE_2D, 0, webgl.RenderingContext.RGBA, webgl.RenderingContext.RGBA, webgl.RenderingContext.UNSIGNED_BYTE, img);
     _gl.texParameteri(webgl.RenderingContext.TEXTURE_2D, webgl.RenderingContext.TEXTURE_MAG_FILTER, webgl.RenderingContext.NEAREST);
     _gl.texParameteri(webgl.RenderingContext.TEXTURE_2D, webgl.RenderingContext.TEXTURE_MIN_FILTER, webgl.RenderingContext.NEAREST);
     _gl.bindTexture(webgl.RenderingContext.TEXTURE_2D, null);
   }
   
   void _setMatrixUniforms() {
-    List<double> tmpList = new List(16);
+    Float32List tmpList = new Float32List(16);
     
     _pMatrix.copyIntoArray(tmpList);
     _gl.uniformMatrix4fv(_uPMatrix, false, tmpList);
@@ -292,7 +293,6 @@ class Lesson05 {
     _gl.activeTexture(webgl.RenderingContext.TEXTURE0);
     _gl.bindTexture(webgl.RenderingContext.TEXTURE_2D, _neheTexture);
     _gl.uniform1i(_samplerUniform, 0);
-
     
     _gl.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, _cubeVertexIndexBuffer);
     _setMatrixUniforms();
@@ -328,5 +328,5 @@ class Lesson05 {
 
 void main() {
   Lesson05 lesson = new Lesson05(document.query('#drawHere'));
-  lesson.start();
+//  lesson.start();
 }
