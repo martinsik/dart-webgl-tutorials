@@ -64,6 +64,8 @@ class Lesson07 {
   Lesson07(CanvasElement canvas) {
     // weird, but without specifying size this array throws exception on []
     _currentlyPressedKeys = new List<bool>(128);
+    for (int i=0; i<_currentlyPressedKeys.length; i++)
+      _currentlyPressedKeys[i] = false;
     _viewportWidth = canvas.width;
     _viewportHeight = canvas.height;
     _gl = canvas.getContext("experimental-webgl");
@@ -90,16 +92,16 @@ class Lesson07 {
     document.onKeyDown.listen(this._handleKeyDown);
     document.onKeyUp.listen(this._handleKeyUp);
 
-    _elmLighting = document.query("#lighting");
-    _elmAmbientR = document.query("#ambientR");
-    _elmAmbientG = document.query("#ambientG");
-    _elmAmbientB = document.query("#ambientB");
-    _elmLightDirectionX = document.query("#lightDirectionX");
-    _elmLightDirectionY = document.query("#lightDirectionY");
-    _elmLightDirectionZ = document.query("#lightDirectionZ");
-    _elmDirectionalR = document.query("#directionalR");
-    _elmDirectionalG = document.query("#directionalG");
-    _elmDirectionalB = document.query("#directionalB");
+    _elmLighting = document.querySelector("#lighting");
+    _elmAmbientR = document.querySelector("#ambientR");
+    _elmAmbientG = document.querySelector("#ambientG");
+    _elmAmbientB = document.querySelector("#ambientB");
+    _elmLightDirectionX = document.querySelector("#lightDirectionX");
+    _elmLightDirectionY = document.querySelector("#lightDirectionY");
+    _elmLightDirectionZ = document.querySelector("#lightDirectionZ");
+    _elmDirectionalR = document.querySelector("#directionalR");
+    _elmDirectionalG = document.querySelector("#directionalG");
+    _elmDirectionalB = document.querySelector("#directionalB");
   }
 
 
@@ -108,16 +110,34 @@ class Lesson07 {
     // use to create animation
     String vsSource = """
     attribute vec3 aVertexPosition;
+    attribute vec3 aVertexNormal;
     attribute vec2 aTextureCoord;
-  
+
     uniform mat4 uMVMatrix;
     uniform mat4 uPMatrix;
-  
+    uniform mat3 uNMatrix;
+
+    uniform vec3 uAmbientColor;
+
+    uniform vec3 uLightingDirection;
+    uniform vec3 uDirectionalColor;
+
+    uniform bool uUseLighting;
+
     varying vec2 vTextureCoord;
-  
+    varying vec3 vLightWeighting;
+
     void main(void) {
       gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
       vTextureCoord = aTextureCoord;
+
+      if (!uUseLighting) {
+          vLightWeighting = vec3(1.0, 1.0, 1.0);
+      } else {
+          vec3 transformedNormal = uNMatrix * aVertexNormal;
+          float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+          vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
+      }
     }
     """;
 
@@ -127,11 +147,13 @@ class Lesson07 {
     precision mediump float;
 
     varying vec2 vTextureCoord;
+    varying vec3 vLightWeighting;
 
     uniform sampler2D uSampler;
 
     void main(void) {
-      gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+      vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+      gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
     }
     """;
 
@@ -358,12 +380,12 @@ class Lesson07 {
     _gl.uniformMatrix4fv(_uPMatrix, false, _pMatrix.storage);
     _gl.uniformMatrix4fv(_uMVMatrix, false, _mvMatrix.storage);
 
-    Matrix3 normalMatrix = _mvMatrix.toInverseMat3();
-    normalMatrix.transpose();
-    _gl.uniformMatrix3fv(_uNMatrix, false, normalMatrix.storage);
+    Matrix3 normalMatrix = _mvMatrix.getRotation();
+    normalMatrix.invert();
+    _gl.uniformMatrix3fv(_uNMatrix, false, normalMatrix.transpose().storage);
   }
 
-  bool render(double time) {
+  void render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
 
@@ -412,10 +434,7 @@ class Lesson07 {
         _elmLightDirectionY.valueAsNumber / 100,
         _elmLightDirectionZ.valueAsNumber / 100
       );
-      Vector3 adjustedLD = new Vector3();
-      lightingDirection.normalize(adjustedLD);
-      adjustedLD.scale(-1);
-      _gl.uniform3fv(_uLightDirection, adjustedLD.storage);
+      _gl.uniform3fv(_uLightDirection, lightingDirection.normalize().scale(-1.0).storage);
 
       _gl.uniform3f(
         _uDirectionalColor,
@@ -495,6 +514,6 @@ class Lesson07 {
 }
 
 void main() {
-  Lesson07 lesson = new Lesson07(document.query('#drawHere'));
+  Lesson07 lesson = new Lesson07(document.querySelector('#drawHere'));
   lesson.start();
 }

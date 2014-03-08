@@ -267,7 +267,7 @@ class Lesson05 {
     _gl.uniformMatrix4fv(_uMVMatrix, false, tmpList);
   }
 
-  bool render(double time) {
+  void render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
 
@@ -327,6 +327,6 @@ class Lesson05 {
 }
 
 void main() {
-  Lesson05 lesson = new Lesson05(document.query('#drawHere'));
+  Lesson05 lesson = new Lesson05(document.querySelector('#drawHere'));
 //  lesson.start();
 }

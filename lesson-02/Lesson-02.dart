@@ -221,6 +221,6 @@ class Lesson02 {
 }
 
 void main() {
-  Lesson02 lesson = new Lesson02(document.query('#drawHere'));
+  Lesson02 lesson = new Lesson02(document.querySelector('#drawHere'));
   lesson.render();
 }
