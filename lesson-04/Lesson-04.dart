@@ -289,7 +289,7 @@ class Lesson04 {
   }
 
 
-  bool render(double time) {
+  void render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
 
@@ -356,6 +356,6 @@ class Lesson04 {
 }
 
 void main() {
-  Lesson04 lesson = new Lesson04(document.query('#drawHere'));
+  Lesson04 lesson = new Lesson04(document.querySelector('#drawHere'));
   lesson.start();
 }
