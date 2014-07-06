@@ -8,9 +8,21 @@
     <canvas id="drawHere" width="400" height="400"></canvas>
 
     <p>
-	    <input type="checkbox" id="lighting" checked><label>Use lighting</label>
-
-	    <input type="range" min="0" max="100">
+    	
+	<input type="checkbox" id="lighting" checked><label>Use lighting</label><br>
+      	
+	<input type="range" id="ambientR" min="0" max="100"><label>Ambiant red</label><br>
+	<input type="range" id="ambientG" min="0" max="100"><label>Ambiant green</label><br>
+	<input type="range" id="ambientB" min="0" max="100"><label>Ambian blue</label><br>
+	
+	<input type="range" id="lightDirectionX" min="0" max="100"><label>Light direct x</label><br>
+	<input type="range" id="lightDirectionY" min="0" max="100"><label>Light direction y</label><br>
+	<input type="range" id="lightDirectionZ" min="0" max="100"><label>Light direction z</label><br>
+	
+	<input type="range" id="directionalR" min="0" max="100"><label>Directional light red</label><br>
+	<input type="range" id="directionalG" min="0" max="100"><label>Directional light green</label><br>
+	<input type="range" id="directionalB" min="0" max="100"><label>Directional light blu</label><br>
+      	
     </p>
 
     <script type="application/dart" src="Lesson-07.dart"></script>
