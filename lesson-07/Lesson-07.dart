@@ -1,22 +1,21 @@
 library lesson7;
 
 import 'dart:html';
-import 'package:vector_math/vector_math.dart';
 import 'dart:collection';
 import 'dart:web_gl' as webgl;
 import 'dart:typed_data';
 import 'dart:math' as math;
 
+import 'package:vector_math/vector_math.dart';
 
 /**
  * based on:
- * http://learningwebgl.com/blog/?p=571
+ * http://learningwebgl.com/blog/?p=684
  *
  * NOTE: To run this example you have to open in on a webserver (url starting with http:// NOT file:///)!
  */
 class Lesson07 {
 
-  CanvasElement _canvas;
   webgl.RenderingContext _gl;
   webgl.Program _shaderProgram;
   int _viewportWidth, _viewportHeight;
@@ -30,7 +29,6 @@ class Lesson07 {
 
   Matrix4 _pMatrix;
   Matrix4 _mvMatrix;
-  Queue<Matrix4> _mvMatrixStack;
 
   int _aVertexPosition;
   int _aTextureCoord;
@@ -38,7 +36,6 @@ class Lesson07 {
   webgl.UniformLocation _uPMatrix;
   webgl.UniformLocation _uMVMatrix;
   webgl.UniformLocation _uNMatrix;
-  webgl.UniformLocation _uSampler;
   webgl.UniformLocation _uUseLighting;
   webgl.UniformLocation _uLightingDirection;
   webgl.UniformLocation _uAmbientColor;
@@ -55,12 +52,9 @@ class Lesson07 {
       _ySpeed = 0.0,
       _zPos = -5.0;
 
-  int _filter = 0;
   double _lastTime = 0.0;
 
   List<bool> _currentlyPressedKeys;
-
-  var _requestAnimationFrame;
 
 
   Lesson07(CanvasElement canvas) {
@@ -201,7 +195,7 @@ class Lesson07 {
     _uPMatrix = _gl.getUniformLocation(_shaderProgram, "uPMatrix");
     _uMVMatrix = _gl.getUniformLocation(_shaderProgram, "uMVMatrix");
     _uNMatrix = _gl.getUniformLocation(_shaderProgram, "uNMatrix");
-    _uSampler = _gl.getUniformLocation(_shaderProgram, "uSampler");
+//    _uSampler = _gl.getUniformLocation(_shaderProgram, "uSampler");
     _uUseLighting = _gl.getUniformLocation(_shaderProgram, "uUseLighting");
     _uAmbientColor = _gl.getUniformLocation(_shaderProgram, "uAmbientColor");
     _uLightingDirection = _gl.getUniformLocation(_shaderProgram, "uLightingDirection");
@@ -210,8 +204,7 @@ class Lesson07 {
 
   void _initBuffers() {
     // variables to store verticies, tecture coordinates and colors
-    List<double> vertices, textureCoords, vertexNormals, colors;
-
+    List<double> vertices, textureCoords, vertexNormals;
 
     // create square
     _cubeVertexPositionBuffer = _gl.createBuffer();
@@ -293,7 +286,7 @@ class Lesson07 {
     _gl.uniformMatrix3fv(_uNMatrix, false, normalMatrix.storage);
   }
 
-  bool render(double time) {
+  void render(double time) {
     _gl.viewport(0, 0, _viewportWidth, _viewportHeight);
     _gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
 
@@ -330,14 +323,11 @@ class Lesson07 {
     _gl.uniform1i(_uUseLighting, _elmLighting.checked ? 1 : 0); // must be int, not bool
 
     if (_elmLighting.checked) {
-
       _gl.uniform3f(_uAmbientColor, _elmAmbientR.valueAsNumber / 100, _elmAmbientG.valueAsNumber / 100, _elmAmbientB.valueAsNumber / 100);
 
       Vector3 lightingDirection = new Vector3(_elmLightDirectionX.valueAsNumber / 100, _elmLightDirectionY.valueAsNumber / 100, _elmLightDirectionZ.valueAsNumber / 100);
       Vector3 adjustedLD = lightingDirection.normalize();
-      //adjustedLD.scale(-1.0);
-      _gl.uniform3fv(_uLightingDirection, adjustedLD.storage);
-      
+      _gl.uniform3fv(_uLightingDirection, adjustedLD.storage);      
       _gl.uniform3f(_uDirectionalColor, _elmDirectionalR.valueAsNumber / 100, _elmDirectionalG.valueAsNumber / 100, _elmDirectionalB.valueAsNumber / 100);
     }
 
@@ -403,7 +393,6 @@ class Lesson07 {
   }
 
   void start() {
-    DateTime d;
     _lastTime = (new DateTime.now()).millisecondsSinceEpoch * 1.0;
     window.requestAnimationFrame(this.render);
   }
