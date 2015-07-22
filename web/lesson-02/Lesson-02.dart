@@ -1,7 +1,7 @@
 library lesson2;
 
 import 'dart:html';
-import 'package:vector_math/vector_math.dart';
+import '../../packages/vector_math/vector_math.dart';
 import 'dart:web_gl' as webgl;
 import 'dart:typed_data';
 
