@@ -2,6 +2,12 @@ name: dart_webgl_tutorials
 version: 0.1.0
 author: Martin Sikora
 homepage: http://martinsikora.com
+environment:
+  sdk: '>=1.11.1 <2.0.0'
 dependencies:
   browser: any
   vector_math: any
+  three:
+    git:
+      url: https://github.com/threeDart/three.dart.git
+      ref: latest

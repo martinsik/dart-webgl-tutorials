@@ -8,7 +8,9 @@ import 'package:three/three.dart';
 
 abstract class AbstractExample {
   String options = "";
+  bool _stop = false;
   int _animFrameId;
+  Completer shutdownCompleter;
 
   init();
   resize(int width, int height);
@@ -32,20 +34,26 @@ abstract class AbstractExample {
     }
   }
 
+  Future stop() {
+    _stop = true;
+    shutdownCompleter = new Completer();
+    return shutdownCompleter.future;
+  }
+
 }
 
 abstract class AbstractWebGLExample extends AbstractExample {
   webgl.RenderingContext gl;
-  bool _stop = false;
-  Completer _shutdownCompleter;
+  Completer shutdownCompleter;
 
+  // webgl.RenderingContext get gl => _gl;
 
   shutdown() {
     gl.bindBuffer(webgl.ARRAY_BUFFER, null);
     gl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, null);
     gl.bindRenderbuffer(webgl.RENDERBUFFER, null);
     gl.bindFramebuffer(webgl.FRAMEBUFFER, null);
-    _shutdownCompleter.complete();
+    shutdownCompleter.complete();
   }
 
   freeBuffers(List<webgl.Buffer> buffers) {
@@ -82,28 +90,22 @@ abstract class AbstractWebGLExample extends AbstractExample {
     return dummyCompleter.future;
   }
 
-  Future stop() {
-    _stop = true;
-    _shutdownCompleter = new Completer();
-    return _shutdownCompleter.future;
-  }
-
 }
 
-abstract class AbstractThreeExample {
+abstract class AbstractThreeExample extends AbstractExample {
   Scene scene;
   Camera camera;
   WebGLRenderer renderer;
 
-  resize(double width, double height) {
-    camera.aspect = width / height;
+  resize(int width, int height) {
+    camera.aspect = width.toDouble() / height.toDouble();
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
   }
 
   shutdown() {
-
+    shutdownCompleter.complete();
   }
 
 }

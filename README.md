@@ -1,7 +1,20 @@
-### Dart WebGL Tutorials
+## Dart WebGL/Three.dart Examples
 
-Ported tutorials from [learningwebgl.com](http://www.learningwebgl.com)
+Small collection of ported tutorials from [learningwebgl.com](http://www.learningwebgl.com) and some [three.dart](https://github.com/threeDart/three.dart) examples.
 
-I started fixing all tutorials to make them work with the latest Dart SDK. Also, I switched to a better math library [vector_math](http://pub.dartlang.org/packages/vector_math). 
+Works with the latest Dart SDK, [three.dart](https://github.com/threeDart/three.dart) examples with `latest` branch.
 
-I should note that I'm not an expert on WebGL, I'm more familiar with standard OpenGL 3.2+ but if you have any problems try look at the original JavaScript lesson.
+- three.dart
+- WebGL
+
+### Running examples locally
+
+```
+$ git clone https://github.com/martinsik/dart-webgl-tutorials.git
+$ cd dart-webgl-tutorials
+$ pub server
+```
+
+Then open `http://localhost:8080` in Dartium.
+
+![Dart WebGL/Three.dart Examples](https://raw.githubusercontent.com/martinsik/dart-webgl-tutorials/master/doc/index.png)
