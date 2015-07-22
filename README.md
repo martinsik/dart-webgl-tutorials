@@ -10,7 +10,7 @@ Works with the latest Dart SDK, [three.dart](https://github.com/threeDart/three.
 
 ### List of content
 
-- three.dart
+- WebGL
   - [lesson 01](http://ahoj.io/dart-webgl-tutorials/#Lesson01)
   - [lesson 02](http://ahoj.io/dart-webgl-tutorials/#Lesson02)
   - [lesson 03](http://ahoj.io/dart-webgl-tutorials/#Lesson03)
@@ -18,7 +18,7 @@ Works with the latest Dart SDK, [three.dart](https://github.com/threeDart/three.
   - [lesson 05](http://ahoj.io/dart-webgl-tutorials/#Lesson05)
   - [lesson 06](http://ahoj.io/dart-webgl-tutorials/#Lesson06)
   - [lesson 07](http://ahoj.io/dart-webgl-tutorials/#Lesson07)
-- WebGL
+- three.dart
   - [basic sphere](http://ahoj.io/dart-webgl-tutorials/#ThreeBasicSphere)
 
 ### Running examples locally
@@ -26,7 +26,7 @@ Works with the latest Dart SDK, [three.dart](https://github.com/threeDart/three.
 ```
 $ git clone https://github.com/martinsik/dart-webgl-tutorials.git
 $ cd dart-webgl-tutorials
-$ pub server
+$ pub serve
 ```
 
 Then open `http://localhost:8080` in Dartium.
