@@ -10,10 +10,17 @@ abstract class AbstractExample {
   String options = "";
   bool _stop = false;
   int _animFrameId;
+  double _elapsedTime;
   Completer shutdownCompleter;
+  int _width, _height;
+  int _offsetWidth, _offsetHeight;
+
+  int get width => _width;
+  int get height => _height;
+  int get offsetWidth => _offsetWidth;
+  int get offsetHeight => _offsetHeight;
 
   init();
-  resize(int width, int height);
   render([double time = 0]);
   shutdown();
 
@@ -22,13 +29,24 @@ abstract class AbstractExample {
     _renderFrame();
   }
 
+  resize(int width, int height) {
+    _width = width;
+    _height = height;
+    _offsetWidth = window.innerWidth - width;
+    _offsetHeight = window.innerHeight - height;
+  }
+
   _renderFrame() {
     if (_stop) {
       window.cancelAnimationFrame(_animFrameId);
       shutdown();
     } else {
-      _animFrameId = window.requestAnimationFrame((var time) {
-        render(time);
+      _animFrameId = window.requestAnimationFrame((double time) {
+        if (_elapsedTime == null) {
+          _elapsedTime = time;
+        }
+        render(time - _elapsedTime);
+        _elapsedTime = time;
         _renderFrame();
       });
     }
@@ -45,8 +63,6 @@ abstract class AbstractExample {
 abstract class AbstractWebGLExample extends AbstractExample {
   webgl.RenderingContext gl;
   Completer shutdownCompleter;
-
-  // webgl.RenderingContext get gl => _gl;
 
   shutdown() {
     gl.bindBuffer(webgl.ARRAY_BUFFER, null);
@@ -96,8 +112,14 @@ abstract class AbstractThreeExample extends AbstractExample {
   Scene scene;
   Camera camera;
   WebGLRenderer renderer;
+  CanvasElement _elm;
+
+  AbstractThreeExample(this._elm);
+
 
   resize(int width, int height) {
+    super.resize(width, height);
+
     camera.aspect = width.toDouble() / height.toDouble();
     camera.updateProjectionMatrix();
 
@@ -106,6 +128,18 @@ abstract class AbstractThreeExample extends AbstractExample {
 
   shutdown() {
     shutdownCompleter.complete();
+  }
+
+  init() {
+    scene = new Scene();
+    renderer = new WebGLRenderer(canvas:_elm);
+    camera = new PerspectiveCamera(45.0, window.innerWidth / window.innerHeight, 0.1, 1000);
+    scene.add(camera);
+  }
+
+  render([double time = 0]) {
+    renderer.setClearColor(new Color(0xffffff), 1);
+    renderer.render(scene, camera);
   }
 
 }

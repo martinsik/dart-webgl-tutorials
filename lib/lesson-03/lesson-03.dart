@@ -37,7 +37,6 @@ class Lesson03 extends AbstractWebGLExample {
 
   double _rTri = 0.0;
   double _rSquare = 0.0;
-  double _lastTime = 0.0;
 
 
   Lesson03(CanvasElement elm) {
@@ -210,7 +209,7 @@ class Lesson03 extends AbstractWebGLExample {
     _pMatrix = makePerspectiveMatrix(radians(45.0), _viewportWidth / _viewportHeight, 0.1, 100.0);
   }
 
-  render([double time = 0]) {
+  render([double time = 0.0]) {
     gl.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
 
     // draw triangle
@@ -252,10 +251,8 @@ class Lesson03 extends AbstractWebGLExample {
     _mvPopMatrix();
 
     // rotate
-    double animationStep = time - _lastTime;
-    _rTri += (90 * animationStep) / 1000.0;
-    _rSquare += (75 * animationStep) / 1000.0;
-    _lastTime = time;
+    _rTri += (90 * time) / 1000.0;
+    _rSquare += (75 * time) / 1000.0;
   }
 
   shutdown() {

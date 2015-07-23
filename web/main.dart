@@ -8,6 +8,8 @@ import 'package:dart_webgl_tutorials/lesson-05/lesson-05.dart';
 import 'package:dart_webgl_tutorials/lesson-06/lesson-06.dart';
 import 'package:dart_webgl_tutorials/lesson-07/lesson-07.dart';
 import 'package:dart_webgl_tutorials/three_basic_sphere/three_basic_sphere.dart';
+import 'package:dart_webgl_tutorials/three_sphere_light_shadow/three_sphere_light_shadow.dart';
+import 'package:dart_webgl_tutorials/three_sphere_2d_coords_to_3d/three_sphere_2d_coords_to_3d.dart';
 
 
 

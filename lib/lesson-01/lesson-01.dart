@@ -16,8 +16,6 @@ class Lesson01 extends AbstractWebGLExample {
   webgl.Buffer _squareVertexPositionBuffer;
   webgl.Program _shaderProgram;
   int _dimensions = 3;
-  int _viewportWidth;
-  int _viewportHeight;
 
   Matrix4 _pMatrix;
   Matrix4 _mvMatrix;
@@ -145,12 +143,11 @@ class Lesson01 extends AbstractWebGLExample {
   }
 
   resize(int width, int height) {
-    _viewportWidth = width;
-    _viewportHeight = height;
+    super.resize(width, height);
 
-    gl.viewport(0, 0, _viewportWidth, _viewportHeight);
+    gl.viewport(0, 0, width, height);
     // field of view is 45°, width-to-height ratio, hide things closer than 0.1 or further than 100
-    _pMatrix = makePerspectiveMatrix(radians(45.0), _viewportWidth / _viewportHeight, 0.1, 100.0);
+    _pMatrix = makePerspectiveMatrix(radians(45.0), width / height, 0.1, 100.0);
   }
 
   render([double time = 0]) {

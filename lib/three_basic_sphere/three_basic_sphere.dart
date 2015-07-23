@@ -1,3 +1,5 @@
+library three_basic_sphere;
+
 import 'dart:html';
 import 'package:three/three.dart';
 import 'package:dart_webgl_tutorials/example.dart';
@@ -5,18 +7,12 @@ import 'package:dart_webgl_tutorials/example.dart';
 
 class ThreeBasicSphere extends AbstractThreeExample {
 
-  CanvasElement _elm;
-  ThreeBasicSphere(this._elm);
+  ThreeBasicSphere(var elm): super(elm);
 
   init() {
-    scene = new Scene();
+    super.init();
 
-    renderer = new WebGLRenderer(canvas:_elm);
-
-    camera = new PerspectiveCamera(45.0, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 500.0;
-
-    scene.add(camera);
 
     var axes = new AxisHelper();
     axes.position.setValues(0.0, 0.0, 0.0);
@@ -31,15 +27,6 @@ class ThreeBasicSphere extends AbstractThreeExample {
     sphere.position.setValues(0.0, 0.0, 0.0);
 
     scene.add(sphere);
-  }
-
-  render([double time = 0]) {
-    renderer.setClearColor(new Color(0xffffff), 1);
-    renderer.render(scene, camera);
-  }
-
-  shutdown() {
-    super.shutdown();
   }
 
 }

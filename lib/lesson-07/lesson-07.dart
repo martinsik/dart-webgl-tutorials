@@ -368,14 +368,9 @@ class Lesson07 extends AbstractWebGLExample {
     _currentlyPressedKeys[event.keyCode] = false;
   }
 
-  _animate(double timeNow) {
-    if (_lastTime != 0) {
-      double elapsed = timeNow - _lastTime;
-
-      _xRot += (_xSpeed * elapsed) / 1000.0;
-      _yRot += (_ySpeed * elapsed) / 1000.0;
-    }
-    _lastTime = timeNow;
+  _animate(double time) {
+    _xRot += (_xSpeed * time) / 1000.0;
+    _yRot += (_ySpeed * time) / 1000.0;
   }
 
   _handleKeys() {

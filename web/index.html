@@ -4,12 +4,13 @@
     <style>
         body { margin: 0; }
         #menu { font-family: courier; font-size: 16px; width: 250px; height: 100vh; padding: 0 15px; box-sizing: border-box; border-right: 1px solid #ddd; }
-        #menu h3 { font-weight: normal; margin: 0; padding: 20px 0 10px 0; }
+        #menu h3 { font-weight: normal; margin: 0; padding: 20px 0 5px 0; }
         #menu ul { padding: 0; margin: 0; }
-        #menu ul li { list-style-type: none; }
+        #menu ul li { font-size: 15px; list-style-type: none; padding: 1px 0; }
         #menu ul li a { text-decoration: none; }
+        #menu ul li a:visited { color: blue; }
         #menu ul li a:hover { text-decoration: underline; }
-        #menu p, #menu p a { color: #888; font-size: 14px; }
+        #menu p, #menu p a { color: #888; font-size: 13px; }
         #options { width: 300px; background-color: rgba(0, 0, 0, 0.2); position: absolute; top: 0; right: 0; padding: 15px; display: none; }
         #drawHere { position: absolute; top: 0; left: 250px; }
     </style>
@@ -19,6 +20,8 @@
         <h3>three.dart</h3>
         <ul>
             <li><a href="#ThreeBasicSphere">basic sphere</a></li>
+            <li><a href="#ThreeSphereLightShadow">sphere, light and shadow</a></li>
+            <li><a href="#ThreeSphere2dCoordsTo3d">sphere, 2d coords to 3d</a></li>
         </ul>
         <h3>WebGL</h3>
         <ul>

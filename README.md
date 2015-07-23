@@ -1,4 +1,4 @@
-## Dart WebGL/Three.dart Examples
+## Dart WebGL/three.dart examples
 
 Small collection of ported tutorials from [learningwebgl.com](http://www.learningwebgl.com) and some [three.dart](https://github.com/threeDart/three.dart) examples.
 

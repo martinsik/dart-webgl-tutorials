@@ -40,7 +40,6 @@ class Lesson05 extends AbstractWebGLExample {
   double _xRot = 0.0;
   double _yRot = 0.0;
   double _zRot = 0.0;
-  double _lastTime = 0.0;
 
 
   Lesson05(CanvasElement elm) {
@@ -307,14 +306,9 @@ class Lesson05 extends AbstractWebGLExample {
   }
 
   _animate(double time) {
-    if (_lastTime != 0) {
-        double animationStep = time - _lastTime;
-
-        _xRot += (90 * animationStep) / 1000.0;
-        _yRot += (90 * animationStep) / 1000.0;
-        _zRot += (90 * animationStep) / 1000.0;
-    }
-    _lastTime = time;
+      _xRot += (90 * time) / 1000.0;
+      _yRot += (90 * time) / 1000.0;
+      _zRot += (90 * time) / 1000.0;
   }
 
   shutdown() {

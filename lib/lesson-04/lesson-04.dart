@@ -37,7 +37,6 @@ class Lesson04 extends AbstractWebGLExample {
 
   double _rPyramid = 0.0;
   double _rCube = 0.0;
-  double _lastTime = 0.0;
 
 
   Lesson04(CanvasElement elm) {
@@ -47,15 +46,6 @@ class Lesson04 extends AbstractWebGLExample {
 
     _initShaders();
     _initBuffers();
-
-    /*if (window.dynamic['requestAnimationFrame']) {
-      _requestAnimationFrame = window.requestAnimationFrame;
-    } else if (window.dynamic['webkitRequestAnimationFrame']) {
-      _requestAnimationFrame = window.webkitRequestAnimationFrame;
-    } else if (window.dynamic['mozRequestAnimationFrame']) {
-      _requestAnimationFrame = window.mozRequestAnimationFrame;
-    }*/
-    //_requestAnimationFrame = window.webkitRequestAnimationFrame;
 
     gl.clearColor(1, 1, 1, 1.0);
     gl.enable(webgl.RenderingContext.DEPTH_TEST);
@@ -287,6 +277,7 @@ class Lesson04 extends AbstractWebGLExample {
   }
 
   resize(int width, int height) {
+    super.resize(width, height);
     _viewportWidth = width;
     _viewportHeight = height;
 
@@ -338,10 +329,8 @@ class Lesson04 extends AbstractWebGLExample {
     _mvPopMatrix();
 
     // rotate
-    double animationStep = time - _lastTime;
-    _rPyramid += (90 * animationStep) / 1000.0;
-    _rCube += (75 * animationStep) / 1000.0;
-    _lastTime = time;
+    _rPyramid += (90 * time) / 1000.0;
+    _rCube += (75 * time) / 1000.0;
   }
 
   shutdown() {
