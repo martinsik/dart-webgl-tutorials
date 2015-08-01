@@ -20,6 +20,8 @@ Works with the latest Dart SDK, [three.dart](https://github.com/threeDart/three.
   - [lesson 07](http://ahoj.io/dart-webgl-tutorials/#Lesson07)
 - three.dart
   - [basic sphere](http://ahoj.io/dart-webgl-tutorials/#ThreeBasicSphere)
+  - [sphere light and shadow](http://ahoj.io/dart-webgl-tutorials/#ThreeSphereLightShadow)
+  - [sphere with 2d mouse coords to 3d](http://ahoj.io/dart-webgl-tutorials/#ThreeSphere2dCoordsTo3d)
 
 ### Running examples locally
 

@@ -1,4 +1,4 @@
-library three_basic_sphere;
+library three_sphere_2d_coords_to_3d;
 
 import 'dart:html';
 import 'dart:async';
@@ -7,6 +7,14 @@ import 'package:vector_math/vector_math.dart';
 import 'package:dart_webgl_tutorials/example.dart';
 import 'package:dart_webgl_tutorials/three_sphere_light_shadow/three_sphere_light_shadow.dart';
 
+/**
+ * This is a followup to three_sphere_light_shadow.
+ *
+ * Examples in this series:
+ * 1. three_basic_sphere
+ * 2. three_sphere_light_shadow
+ * 3. three_sphere_2d_coords_to_3d
+ */
 
 class ThreeSphere2dCoordsTo3d extends ThreeSphereLightShadow {
 

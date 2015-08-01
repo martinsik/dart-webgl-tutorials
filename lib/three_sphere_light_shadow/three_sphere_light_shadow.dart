@@ -5,7 +5,7 @@ import 'package:three/three.dart';
 import 'package:dart_webgl_tutorials/example.dart';
 
 /**
- * This is a followup to three_basic_sphere
+ * This is a followup to three_basic_sphere.
  *
  * Examples in this series:
  * 1. three_basic_sphere

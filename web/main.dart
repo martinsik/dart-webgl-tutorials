@@ -27,7 +27,6 @@ main() {
   var optionsElm = querySelector('#options');
   var menuWidth = menuElm.offsetWidth;
   var canvasElm = document.querySelector('#drawHere');
-//  var context = canvasElm.getContext("experimental-webgl");
   var lesson = null;
 
   resize([_]) {
