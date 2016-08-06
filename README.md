@@ -11,17 +11,17 @@ Works with the latest Dart SDK, [three.dart](https://github.com/threeDart/three.
 ### List of content
 
 - WebGL
-  - [lesson 01](http://ahoj.io/dart-webgl-tutorials/#Lesson01)
-  - [lesson 02](http://ahoj.io/dart-webgl-tutorials/#Lesson02)
-  - [lesson 03](http://ahoj.io/dart-webgl-tutorials/#Lesson03)
-  - [lesson 04](http://ahoj.io/dart-webgl-tutorials/#Lesson04)
-  - [lesson 05](http://ahoj.io/dart-webgl-tutorials/#Lesson05)
-  - [lesson 06](http://ahoj.io/dart-webgl-tutorials/#Lesson06)
-  - [lesson 07](http://ahoj.io/dart-webgl-tutorials/#Lesson07)
+  - [lesson 01](http://usualcarrot.com/dart-webgl-tutorials/#Lesson01)
+  - [lesson 02](http://usualcarrot.com/dart-webgl-tutorials/#Lesson02)
+  - [lesson 03](http://usualcarrot.com/dart-webgl-tutorials/#Lesson03)
+  - [lesson 04](http://usualcarrot.com/dart-webgl-tutorials/#Lesson04)
+  - [lesson 05](http://usualcarrot.com/dart-webgl-tutorials/#Lesson05)
+  - [lesson 06](http://usualcarrot.com/dart-webgl-tutorials/#Lesson06)
+  - [lesson 07](http://usualcarrot.com/dart-webgl-tutorials/#Lesson07)
 - three.dart
-  - [basic sphere](http://ahoj.io/dart-webgl-tutorials/#ThreeBasicSphere)
-  - [sphere light and shadow](http://ahoj.io/dart-webgl-tutorials/#ThreeSphereLightShadow)
-  - [sphere with 2d mouse coords to 3d](http://ahoj.io/dart-webgl-tutorials/#ThreeSphere2dCoordsTo3d)
+  - [basic sphere](http://usualcarrot.com/dart-webgl-tutorials/#ThreeBasicSphere)
+  - [sphere light and shadow](http://usualcarrot.com/dart-webgl-tutorials/#ThreeSphereLightShadow)
+  - [sphere with 2d mouse coords to 3d](http://usualcarrot.com/dart-webgl-tutorials/#ThreeSphere2dCoordsTo3d)
 
 ### Running examples locally
 
